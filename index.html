@@ -1,258 +1,238 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ระบบสั่งซื้อสินค้า</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: "Segoe UI", Tahoma, sans-serif;
-      background: #f4f6f8;
-      color: #333;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระบบสั่งซื้อสินค้า</title>
 
-    header {
-      background: #1f2937;
-      color: #fff;
-      padding: 15px;
-      text-align: center;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  background: #f4f6f8;
+}
 
-    nav {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      background: #111827;
-      padding: 10px;
-    }
+header {
+  background: #1f2937;
+  color: #fff;
+  padding: 15px;
+  text-align: center;
+}
 
-    nav button {
-      background: #374151;
-      color: #fff;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
+main {
+  padding: 15px;
+  max-width: 1000px;
+  margin: auto;
+}
 
-    nav button.active {
-      background: #2563eb;
-    }
+section {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
 
-    main {
-      padding: 15px;
-      max-width: 1000px;
-      margin: auto;
-    }
+.flex {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
 
-    section {
-      display: none;
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
+input, select {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+}
 
-    section.active {
-      display: block;
-    }
+button {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+}
 
-    h2 {
-      margin-top: 0;
-    }
+.primary { background: #2563eb; color: #fff; }
+.danger { background: #dc2626; color: #fff; }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
 
-    th, td {
-      border-bottom: 1px solid #e5e7eb;
-      padding: 10px;
-      text-align: center;
-    }
+th, td {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 8px;
+  text-align: center;
+}
 
-    th {
-      background: #f9fafb;
-    }
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.4);
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
 
-    input, select {
-      padding: 8px;
-      width: 100%;
-      border-radius: 6px;
-      border: 1px solid #d1d5db;
-    }
+.modal-box {
+  background: #fff;
+  padding: 20px;
+  width: 90%;
+  max-width: 420px;
+  border-radius: 12px;
+  text-align: center;
+}
 
-    button.primary {
-      background: #2563eb;
-      color: #fff;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    button.danger {
-      background: #dc2626;
-      color: #fff;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .flex {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    /* Modal */
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.4);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .modal-box {
-      background: #fff;
-      padding: 20px;
-      width: 90%;
-      max-width: 400px;
-      border-radius: 12px;
-      text-align: center;
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 15px;
-    }
-
-    @media (max-width: 600px) {
-      nav { flex-direction: column; }
-    }
-  </style>
+.hide-for-capture { display: none !important; }
+.datetime { font-size: 14px; color: #555; margin-bottom: 10px; }
+</style>
 </head>
+
 <body>
 
 <header>
   <h1>ระบบสั่งซื้อสินค้า</h1>
-  <p>ใช้งานได้ทั้งมือถือและคอมพิวเตอร์</p>
+  <p>ใช้สำหรับจดออเดอร์</p>
 </header>
 
-<nav>
-  <button class="active" onclick="showPage('order')">รายการสั่งซื้อ</button>
-</nav>
-
 <main>
+<section>
+  <h2>เลือกรายการ</h2>
 
-  <!-- หน้า 1 รายการสั่งซื้อ -->
-  <section id="order" class="active">
-    <h2>เลือกรายการสินค้า</h2>
+  <div class="flex">
+    <select id="product">
+      <optgroup label="🥩 เนื้อสัตว์">
+        <option value="หมูสไลซ์">หมูสไลซ์</option>
+        <option value="หมูหมักงา">หมูหมักงา</option>
+        <option value="หมูสามชั้น">หมูสามชั้น</option>
+        <option value="เนื้อวัวสไลซ์">เนื้อวัวสไลซ์</option>
+        <option value="เนื้อหมักนุ่ม">เนื้อหมักนุ่ม</option>
+        <option value="ไก่หมัก">ไก่หมัก</option>
+        <option value="เบคอน">เบคอน</option>
+        <option value="ไส้กรอก">ไส้กรอก</option>
+        <option value="ลูกชิ้น">ลูกชิ้น</option>
+      </optgroup>
 
-    <div class="flex">
-      <select id="product">
-        <option value="สามชั้น">สามชั้น</option>
-        <option value="จี้ก้อน">จี้ก้อน</option>
-        <option value="ตับก้อน">ตับก้อน</option>
-        <option value="กุ้งสด">กุ้งสด</option>
-        <option value="ปลาหมึกสด">ปลาหมึกสด</option>
-      </select>
-      <input type="number" id="qty" placeholder="จำนวน" />
-      <button class="primary" onclick="addOrder()">เพิ่มรายการ</button>
-    </div>
+      <optgroup label="🦐 อาหารทะเล">
+        <option value="กุ้ง">กุ้ง</option>
+        <option value="ปลาหมึก">ปลาหมึก</option>
+        <option value="หอยแมลงภู่">หอยแมลงภู่</option>
+        <option value="หอยเชลล์">หอยเชลล์</option>
+        <option value="ปลา">ปลา</option>
+        <option value="ปลาดอลลี่">ปลาดอลลี่</option>
+      </optgroup>
+    </select>
+
+    <input type="number" id="qty" placeholder="จำนวน">
+    <input type="text" id="note" placeholder="หมายเหตุ (ถ้ามี)">
+    <button class="primary" onclick="addOrder()">เพิ่ม</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>รายการ</th>
+        <th>จำนวน</th>
+        <th>หมายเหตุ</th>
+        <th>ลบ</th>
+      </tr>
+    </thead>
+    <tbody id="orderList"></tbody>
+  </table>
+
+  <div class="flex">
+    <button class="danger" onclick="clearAll()">ล้างทั้งหมด</button>
+    <button class="primary" onclick="openSummary()">เสร็จสิ้น</button>
+  </div>
+</section>
+</main>
+
+<!-- Summary -->
+<div id="summaryModal" class="modal">
+  <div class="modal-box" id="summaryBox">
+    <h3>สรุปรายการสั่ง</h3>
+    <div class="datetime" id="dt"></div>
 
     <table>
       <thead>
         <tr>
           <th>รายการ</th>
           <th>จำนวน</th>
-          <th>ลบ</th>
+          <th>หมายเหตุ</th>
         </tr>
       </thead>
-      <tbody id="orderList"></tbody>
+      <tbody id="summaryList"></tbody>
     </table>
 
-    <button class="danger" onclick="clearAll()">ล้างรายการทั้งหมด</button>
-  </section>
-
-  
-</main>
-
-<!-- Modal -->
-<div id="startupModal" class="modal">
-  <div class="modal-box">
-    <h3>พบข้อมูลการสั่งก่อนหน้า</h3>
-    <p>ต้องการใช้ข้อมูลเดิมหรือเริ่มใหม่?</p>
-    <div class="modal-actions">
-      <button class="primary" onclick="useOldData()">ใช้ข้อมูลเดิม</button>
-      <button class="danger" onclick="clearAll()">เริ่มใหม่</button>
+    <div class="flex capture-buttons">
+      <button class="primary" onclick="saveImg()">บันทึกรูป</button>
+      <button class="danger" onclick="closeSummary()">ปิด</button>
     </div>
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
 <script>
-  let orders = JSON.parse(localStorage.getItem('orders')) || [];
+let orders = [];
 
-  function showPage(id) {
-    document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    event.target.classList.add('active');
-  }
+function addOrder() {
+  const name = product.value;
+  const qty = document.getElementById("qty").value;
+  const note = document.getElementById("note").value;
 
-  function renderOrders() {
-    const tb = document.getElementById('orderList');
-    tb.innerHTML = '';
-    orders.forEach((o, i) => {
-      tb.innerHTML += `<tr><td>${o.name}</td><td>${o.qty}</td><td><button class="danger" onclick="removeOrder(${i})">❌</button></td></tr>`;
-    });
-    localStorage.setItem('orders', JSON.stringify(orders));
-  }
+  if (qty <= 0) return alert("กรุณาใส่จำนวน");
 
-  function addOrder() {
-    const name = product.value;
-    const qty = qtyInput = document.getElementById('qty').value;
-    if (!qty) return;
-    orders.push({ name, qty });
-    document.getElementById('qty').value = '';
-    renderOrders();
-  }
+  orders.push({ name, qty, note });
+  document.getElementById("qty").value = "";
+  document.getElementById("note").value = "";
+  render();
+}
 
-  function removeOrder(i) {
-    orders.splice(i, 1);
-    renderOrders();
-  }
+function render() {
+  orderList.innerHTML = "";
+  orders.forEach((o,i)=>{
+    orderList.innerHTML += `
+    <tr>
+      <td>${o.name}</td>
+      <td>${o.qty}</td>
+      <td>${o.note || "-"}</td>
+      <td><button class="danger" onclick="orders.splice(${i},1);render()">❌</button></td>
+    </tr>`;
+  });
+}
 
-  function clearAll() {
-    orders = [];
-    localStorage.removeItem('orders');
-    renderOrders();
-    document.getElementById('startupModal').style.display = 'none';
-  }
+function clearAll(){ orders=[]; render(); }
 
-  
-  
-  
-  function useOldData() {
-    document.getElementById('startupModal').style.display = 'none';
-    renderOrders();
-  }
+function openSummary(){
+  if(!orders.length) return alert("ไม่มีรายการ");
+  summaryList.innerHTML="";
+  orders.forEach(o=>{
+    summaryList.innerHTML+=`
+    <tr>
+      <td>${o.name}</td>
+      <td>${o.qty}</td>
+      <td>${o.note || "-"}</td>
+    </tr>`;
+  });
+  dt.innerText = "วันที่ " + new Date().toLocaleString("th-TH");
+  summaryModal.style.display="flex";
+}
 
-  window.onload = () => {
-    if (orders.length > 0) {
-      document.getElementById('startupModal').style.display = 'flex';
-    }
-    renderOrders();
-    
-  }
+function closeSummary(){ summaryModal.style.display="none"; }
+
+function saveImg(){
+  document.querySelector(".capture-buttons").classList.add("hide-for-capture");
+  html2canvas(summaryBox).then(c=>{
+    const a=document.createElement("a");
+    a.href=c.toDataURL();
+    a.download="order-summary.png";
+    a.click();
+    document.querySelector(".capture-buttons").classList.remove("hide-for-capture");
+  });
+}
 </script>
 
 </body>
