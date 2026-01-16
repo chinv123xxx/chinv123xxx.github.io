@@ -104,28 +104,34 @@ th, td {
   <div class="flex">
     <select id="product">
       <optgroup label="🥩 เนื้อสัตว์">
-        <option value="หมูสไลซ์">หมูสไลซ์</option>
-        <option value="หมูหมักงา">หมูหมักงา</option>
-        <option value="หมูสามชั้น">หมูสามชั้น</option>
-        <option value="เนื้อวัวสไลซ์">เนื้อวัวสไลซ์</option>
-        <option value="เนื้อหมักนุ่ม">เนื้อหมักนุ่ม</option>
-        <option value="ไก่หมัก">ไก่หมัก</option>
-        <option value="เบคอน">เบคอน</option>
-        <option value="ไส้กรอก">ไส้กรอก</option>
-        <option value="ลูกชิ้น">ลูกชิ้น</option>
+        <option>หมูสไลซ์</option>
+        <option>หมูหมักงา</option>
+        <option>หมูสามชั้น</option>
+        <option>เนื้อวัวสไลซ์</option>
+        <option>เนื้อหมักนุ่ม</option>
+        <option>ไก่หมัก</option>
+        <option>เบคอน</option>
+        <option>ไส้กรอก</option>
+        <option>ลูกชิ้น</option>
       </optgroup>
-
       <optgroup label="🦐 อาหารทะเล">
-        <option value="กุ้ง">กุ้ง</option>
-        <option value="ปลาหมึก">ปลาหมึก</option>
-        <option value="หอยแมลงภู่">หอยแมลงภู่</option>
-        <option value="หอยเชลล์">หอยเชลล์</option>
-        <option value="ปลา">ปลา</option>
-        <option value="ปลาดอลลี่">ปลาดอลลี่</option>
+        <option>กุ้ง</option>
+        <option>ปลาหมึก</option>
+        <option>หอยแมลงภู่</option>
+        <option>หอยเชลล์</option>
+        <option>ปลา</option>
+        <option>ปลาดอลลี่</option>
       </optgroup>
     </select>
 
-    <input type="number" id="qty" placeholder="จำนวน">
+    <input type="number" id="qty" placeholder="จำนวน" style="width:80px">
+
+    <select id="unit">
+      <option value="กก.">กก.</option>
+      <option value="ชิ้น">ชิ้น</option>
+      <option value="แพ็ค">แพ็ค</option>
+    </select>
+
     <input type="text" id="note" placeholder="หมายเหตุ (ถ้ามี)">
     <button class="primary" onclick="addOrder()">เพิ่ม</button>
   </div>
@@ -176,18 +182,33 @@ th, td {
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <script>
-let orders = [];
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+function saveData() {
+  localStorage.setItem("orders", JSON.stringify(orders));
+}
 
 function addOrder() {
   const name = product.value;
   const qty = document.getElementById("qty").value;
+  const unit = document.getElementById("unit").value;
   const note = document.getElementById("note").value;
 
-  if (qty <= 0) return alert("กรุณาใส่จำนวน");
+  if (!qty || qty <= 0) {
+    alert("กรุณาใส่จำนวน");
+    return;
+  }
 
-  orders.push({ name, qty, note });
+  orders.push({
+    name,
+    qty: qty + " " + unit,
+    note
+  });
+
   document.getElementById("qty").value = "";
   document.getElementById("note").value = "";
+
+  saveData();
   render();
 }
 
@@ -199,12 +220,26 @@ function render() {
       <td>${o.name}</td>
       <td>${o.qty}</td>
       <td>${o.note || "-"}</td>
-      <td><button class="danger" onclick="orders.splice(${i},1);render()">❌</button></td>
+      <td>
+        <button class="danger"
+          onclick="confirm('ลบรายการนี้?') && removeItem(${i})">❌</button>
+      </td>
     </tr>`;
   });
 }
 
-function clearAll(){ orders=[]; render(); }
+function removeItem(i){
+  orders.splice(i,1);
+  saveData();
+  render();
+}
+
+function clearAll(){
+  if(!confirm("ล้างทั้งหมด?")) return;
+  orders=[];
+  saveData();
+  render();
+}
 
 function openSummary(){
   if(!orders.length) return alert("ไม่มีรายการ");
@@ -221,7 +256,9 @@ function openSummary(){
   summaryModal.style.display="flex";
 }
 
-function closeSummary(){ summaryModal.style.display="none"; }
+function closeSummary(){
+  summaryModal.style.display="none";
+}
 
 function saveImg(){
   document.querySelector(".capture-buttons").classList.add("hide-for-capture");
@@ -233,6 +270,8 @@ function saveImg(){
     document.querySelector(".capture-buttons").classList.remove("hide-for-capture");
   });
 }
+
+render();
 </script>
 
 </body>
