@@ -90,36 +90,15 @@ th, td {
 .hide-for-capture { display: none !important; }
 .datetime { font-size: 14px; color: #555; margin-bottom: 10px; }
 
-/* ====== ⭐ Responsive มือถือ ====== */
+/* ===== Responsive มือถือ ===== */
 @media (max-width: 768px) {
-
-  header h1 {
-    font-size: 20px;
-  }
-
-  section {
-    padding: 15px;
-  }
-
-  .flex {
-    flex-direction: column;
-  }
-
-  input, select, button {
-    width: 100% !important;
-  }
-
-  table {
-    font-size: 14px;
-  }
-
-  th, td {
-    padding: 6px;
-  }
-
-  .modal-box {
-    width: 95%;
-  }
+  header h1 { font-size: 20px; }
+  section { padding: 15px; }
+  .flex { flex-direction: column; }
+  input, select, button { width: 100% !important; }
+  table { font-size: 14px; }
+  th, td { padding: 6px; }
+  .modal-box { width: 95%; }
 }
 </style>
 </head>
@@ -128,7 +107,7 @@ th, td {
 
 <header>
   <h1>ระบบสั่งซื้อสินค้า</h1>
-  <p>ใช้สำหรับจดออเดอร์</p>
+  <p>ใช้สำหรับจดออเดอร์(ร้านเจนสาขาอุดรธานี)</p>
 </header>
 
 <main>
@@ -159,13 +138,11 @@ th, td {
     </select>
 
     <input type="number" id="qty" placeholder="จำนวน">
-
     <select id="unit">
       <option>กก.</option>
       <option>ขีด</option>
       <option>แพ็ค</option>
     </select>
-
     <input type="text" id="note" placeholder="หมายเหตุ (ถ้ามี)">
     <button class="primary" onclick="addOrder()">➕ เพิ่มรายการ</button>
   </div>
@@ -189,6 +166,7 @@ th, td {
 </section>
 </main>
 
+<!-- สรุปรายการ -->
 <div id="summaryModal" class="modal">
   <div class="modal-box" id="summaryBox">
     <h3>สรุปรายการสั่ง</h3>
@@ -217,24 +195,41 @@ th, td {
 <script>
 let orders = JSON.parse(localStorage.getItem("orders")) || [];
 
+/* ===== ถามเมื่อเปิดลิงก์ ===== */
+window.onload = function () {
+  if (orders.length > 0) {
+    const useOld = confirm(
+      "พบข้อมูลเดิมอยู่\n\nกด OK = ใช้ข้อมูลเดิม\nกด Cancel = เริ่มรายการใหม่"
+    );
+    if (!useOld) {
+      orders = [];
+      localStorage.removeItem("orders");
+    }
+  }
+  render();
+};
+
 function saveData() {
   localStorage.setItem("orders", JSON.stringify(orders));
 }
 
 function addOrder() {
-  const name = product.value;
-  const qty = document.getElementById("qty").value;
-  const unit = document.getElementById("unit").value;
-  const note = document.getElementById("note").value;
+  const qtyInput = document.getElementById("qty");
+  const noteInput = document.getElementById("note");
 
-  if (!qty || qty <= 0) {
+  if (!qtyInput.value || qtyInput.value <= 0) {
     alert("กรุณาใส่จำนวน");
     return;
   }
 
-  orders.push({ name, qty: qty + " " + unit, note });
-  qty.value = "";
-  note.value = "";
+  orders.push({
+    name: product.value,
+    qty: qtyInput.value + " " + unit.value,
+    note: noteInput.value
+  });
+
+  qtyInput.value = "";
+  noteInput.value = "";
 
   saveData();
   render();
@@ -242,62 +237,59 @@ function addOrder() {
 
 function render() {
   orderList.innerHTML = "";
-  orders.forEach((o,i)=>{
+  orders.forEach((o, i) => {
     orderList.innerHTML += `
-    <tr>
-      <td>${o.name}</td>
-      <td>${o.qty}</td>
-      <td>${o.note || "-"}</td>
-      <td><button class="danger" onclick="removeItem(${i})">❌</button></td>
-    </tr>`;
+      <tr>
+        <td>${o.name}</td>
+        <td>${o.qty}</td>
+        <td>${o.note || "-"}</td>
+        <td><button class="danger" onclick="removeItem(${i})">❌</button></td>
+      </tr>`;
   });
 }
 
-function removeItem(i){
-  orders.splice(i,1);
+function removeItem(i) {
+  orders.splice(i, 1);
   saveData();
   render();
 }
 
-function clearAll(){
-  if(confirm("ล้างทั้งหมด?")){
-    orders=[];
-    saveData();
-    render();
-  }
+function clearAll() {
+  if (!confirm("ล้างทั้งหมด?")) return;
+  orders = [];
+  localStorage.removeItem("orders");
+  render();
 }
 
-function openSummary(){
-  if(!orders.length) return alert("ไม่มีรายการ");
-  summaryList.innerHTML="";
-  orders.forEach(o=>{
-    summaryList.innerHTML+=`
-    <tr>
-      <td>${o.name}</td>
-      <td>${o.qty}</td>
-      <td>${o.note || "-"}</td>
-    </tr>`;
+function openSummary() {
+  if (!orders.length) return alert("ไม่มีรายการ");
+  summaryList.innerHTML = "";
+  orders.forEach(o => {
+    summaryList.innerHTML += `
+      <tr>
+        <td>${o.name}</td>
+        <td>${o.qty}</td>
+        <td>${o.note || "-"}</td>
+      </tr>`;
   });
   dt.innerText = "วันที่ " + new Date().toLocaleString("th-TH");
-  summaryModal.style.display="flex";
+  summaryModal.style.display = "flex";
 }
 
-function closeSummary(){
-  summaryModal.style.display="none";
+function closeSummary() {
+  summaryModal.style.display = "none";
 }
 
-function saveImg(){
+function saveImg() {
   document.querySelector(".capture-buttons").classList.add("hide-for-capture");
-  html2canvas(summaryBox).then(c=>{
-    const a=document.createElement("a");
-    a.href=c.toDataURL();
-    a.download="order-summary.png";
+  html2canvas(summaryBox).then(canvas => {
+    const a = document.createElement("a");
+    a.href = canvas.toDataURL();
+    a.download = "order-summary.png";
     a.click();
     document.querySelector(".capture-buttons").classList.remove("hide-for-capture");
   });
 }
-
-render();
 </script>
 
 </body>
