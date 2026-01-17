@@ -40,16 +40,18 @@ section {
 }
 
 input, select {
-  padding: 8px;
-  border-radius: 6px;
+  padding: 10px;
+  border-radius: 8px;
   border: 1px solid #d1d5db;
+  font-size: 16px;
 }
 
 button {
   border: none;
-  border-radius: 8px;
-  padding: 10px 16px;
+  border-radius: 10px;
+  padding: 12px 16px;
   cursor: pointer;
+  font-size: 16px;
 }
 
 .primary { background: #2563eb; color: #fff; }
@@ -87,6 +89,38 @@ th, td {
 
 .hide-for-capture { display: none !important; }
 .datetime { font-size: 14px; color: #555; margin-bottom: 10px; }
+
+/* ====== ⭐ Responsive มือถือ ====== */
+@media (max-width: 768px) {
+
+  header h1 {
+    font-size: 20px;
+  }
+
+  section {
+    padding: 15px;
+  }
+
+  .flex {
+    flex-direction: column;
+  }
+
+  input, select, button {
+    width: 100% !important;
+  }
+
+  table {
+    font-size: 14px;
+  }
+
+  th, td {
+    padding: 6px;
+  }
+
+  .modal-box {
+    width: 95%;
+  }
+}
 </style>
 </head>
 
@@ -124,16 +158,16 @@ th, td {
       </optgroup>
     </select>
 
-    <input type="number" id="qty" placeholder="จำนวน" style="width:80px">
+    <input type="number" id="qty" placeholder="จำนวน">
 
     <select id="unit">
-      <option value="กก.">กก.</option>
-      <option value="ชิ้น">ขีด</option>
-      <option value="แพ็ค">แพ็ค</option>
+      <option>กก.</option>
+      <option>ขีด</option>
+      <option>แพ็ค</option>
     </select>
 
     <input type="text" id="note" placeholder="หมายเหตุ (ถ้ามี)">
-    <button class="primary" onclick="addOrder()">เพิ่ม</button>
+    <button class="primary" onclick="addOrder()">➕ เพิ่มรายการ</button>
   </div>
 
   <table>
@@ -155,7 +189,6 @@ th, td {
 </section>
 </main>
 
-<!-- Summary -->
 <div id="summaryModal" class="modal">
   <div class="modal-box" id="summaryBox">
     <h3>สรุปรายการสั่ง</h3>
@@ -199,14 +232,9 @@ function addOrder() {
     return;
   }
 
-  orders.push({
-    name,
-    qty: qty + " " + unit,
-    note
-  });
-
-  document.getElementById("qty").value = "";
-  document.getElementById("note").value = "";
+  orders.push({ name, qty: qty + " " + unit, note });
+  qty.value = "";
+  note.value = "";
 
   saveData();
   render();
@@ -220,10 +248,7 @@ function render() {
       <td>${o.name}</td>
       <td>${o.qty}</td>
       <td>${o.note || "-"}</td>
-      <td>
-        <button class="danger"
-          onclick="confirm('ลบรายการนี้?') && removeItem(${i})">❌</button>
-      </td>
+      <td><button class="danger" onclick="removeItem(${i})">❌</button></td>
     </tr>`;
   });
 }
@@ -235,10 +260,11 @@ function removeItem(i){
 }
 
 function clearAll(){
-  if(!confirm("ล้างทั้งหมด?")) return;
-  orders=[];
-  saveData();
-  render();
+  if(confirm("ล้างทั้งหมด?")){
+    orders=[];
+    saveData();
+    render();
+  }
 }
 
 function openSummary(){
