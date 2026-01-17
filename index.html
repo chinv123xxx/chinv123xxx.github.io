@@ -199,7 +199,7 @@ let orders = JSON.parse(localStorage.getItem("orders")) || [];
 window.onload = function () {
   if (orders.length > 0) {
     const useOld = confirm(
-      "พบข้อมูลเดิมอยู่\n\nกด OK = ใช้ข้อมูลเดิม\nกด Cancel = เริ่มรายการใหม่"
+      "พบข้อมูลเดิมอยู่\n\nกด ตกลง = ใช้ข้อมูลเดิม\nกด ยกเลิก = เริ่มรายการใหม่"
     );
     if (!useOld) {
       orders = [];
